@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registered People</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f3fc;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #5a189a;
+    }
+    .person-list {
+      width: 60%;
+      margin: auto;
+    }
+    .person-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fff;
+      padding: 12px 16px;
+      margin: 8px 0;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .person-name {
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+    }
+    .view-btn {
+      background-color: #6a0dad;
+      color: white;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .view-btn:hover {
+      background-color: #4b0082;
+    }
+  </style>
+</head>
+<body>
+  <h1>Registered Peoples</h1>
+  <div class="person-list">
+    {% for person in people %}
+      <div class="person-row">
+        <span class="person-name">{{ person.full_name }}</span>
+        <a href="{% url 'person_details' person.id %}">
+          <button class="view-btn">View</button>
+        </a>
+      </div>
+    {% empty %}
+      <p style="text-align:center;">No registered people found.</p>
+    {% endfor %}
+  </div>
+</body>
+
+</html>

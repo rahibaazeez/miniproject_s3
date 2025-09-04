@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Applied Persons</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container my-5">
+        <div class="card shadow-lg">
+            <div class="card-header bg-primary text-white text-center">
+                <h2>Applied Persons</h2>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped table-hover align-middle text-center">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Employee Name</th>
+                            <th>Email</th>
+                            <th>Event</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in applied_list %}
+                        <tr>
+                            <td>{{ item.employee.full_name }}</td>
+                            <td>{{ item.employee.email }}</td>
+                            <td>{{ item.event.event_name }}</td>
+                            <td>
+                                <span class="badge {% if item.status == 'Applied' %}bg-warning
+                                                   {% elif item.status == 'Confirmed' %}bg-success
+                                                   {% elif item.status == 'Declined' %}bg-danger{% endif %}">
+                                    {{ item.status }}
+                                </span>
+                            </td>
+                            <td>
+                                <!-- Buttons always visible -->
+                                <form action="{% url 'respond_appointment' item.id 'Confirmed' %}" method="post" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button class="btn btn-success btn-sm">Confirm</button>
+                                </form>
+                                <form action="{% url 'respond_appointment' item.id 'Declined' %}" method="post" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button class="btn btn-danger btn-sm">Decline</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5" class="text-muted">No applications yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

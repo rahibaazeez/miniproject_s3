@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Employee Home</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #e6e6fa; /* Light Violet */
+      font-family: Arial, sans-serif;
+    }
+    .navbar {
+      background-color: #9370db; /* Medium Purple */
+    }
+    .nav-link i {
+      font-size: 1.5rem;
+    }
+    .card {
+      border-radius: 15px;
+      box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+      width: 100%; /* Full width inside column */
+    }
+    .card:hover {
+      transform: scale(1.03);
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+   {% include "employee/nav.html" %}
+
+  <!-- Welcome Section -->
+  <div class="container text-center mt-5">
+    <h2 class="fw-bold text-dark">Welcome, Employee!</h2>
+    <p class="text-muted">Manage your profile, check job vacancies, and view assigned events here.</p>
+  </div>
+
+  <!-- Dashboard Cards (Event Details & Events) -->
+  <div class="container mt-4">
+    <div class="row g-4 justify-content-center">
+      <div class="col-md-6">
+        <div class="card p-4 text-center">
+          <h5 class="fw-bold">Event Details</h5>
+          <p>Check available events and their details.</p>
+          <a href="{% url 'employee_event_details' %}" class="btn btn-success">Go</a>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card p-4 text-center">
+          <h5 class="fw-bold">Events</h5>
+          <p>View your assigned events and schedules.</p>
+          <a href="{% url 'employee_events' %}" class="btn btn-warning">Go</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

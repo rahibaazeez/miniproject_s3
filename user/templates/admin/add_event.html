@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Event</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: #d8bfd8; /* Darker violet */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      background-color: #e6cfe6; /* Slightly darker light violet */
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 800px;
+      padding: 40px;
+      box-sizing: border-box;
+    }
+
+    .form-title {
+      text-align: center;
+      color: #2c3e50;
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 30px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 25px;
+      margin-bottom: 25px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #34495e;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    input[type="time"],
+    input[type="number"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 14px;
+      border-radius: 8px;
+      border: 1px solid #dcdcdc;
+      box-sizing: border-box;
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      outline: none;
+      border-color: #3498db;
+    }
+
+    textarea {
+      grid-column: span 2;
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    .submit-btn {
+      grid-column: span 2;
+      padding: 15px;
+      background-color: #3498db;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+
+    .submit-btn:hover {
+      background-color: #2980b9;
+    }
+
+    .submit-btn:active {
+      transform: scale(0.98);
+    }
+
+    @media (max-width: 600px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="form-title">Add New Event</h1>
+
+    <form id="eventForm" action="{% url 'add_event' %}" method="post">
+      {% csrf_token %}
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label for="event_name">Event Name</label>
+          <input type="text" id="event_name" name="event_name" placeholder="Enter event name" required>
+        </div>
+
+        <div class="form-group">
+          <label for="eventCategory">Category</label>
+          <select id="eventCategory" name="eventCategory" required>
+            <option value="" disabled selected>Select category</option>
+            <option value="Birthday">Birthday</option>
+            <option value="Marriage">Marriage</option>
+            <option value="Engagement">Engagement</option>
+            <option value="Festival">Festival</option>
+            <option value="Corporate">Corporate</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="eventPlace">Place Type</label>
+          <select id="eventPlace" name="eventPlace" required>
+            <option value="" disabled selected>Select place</option>
+            <option value="Convention Center">Convention Center</option>
+            <option value="Hall">Hall</option>
+            <option value="Destination">Destination</option>
+            <option value="Home">Home</option>
+            <option value="Outdoor Ground">Outdoor Ground</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="eventDate">Date</label>
+          <input type="date" id="eventDate" name="eventDate" required>
+        </div>
+
+        <div class="form-group">
+          <label for="eventTime">Time</label>
+          <input type="time" id="eventTime" name="eventTime" required>
+        </div>
+
+        <div class="form-group">
+          <label for="salary">Salary</label>
+          <input type="number" id="salary" name="salary" placeholder="Enter salary" required>
+        </div>
+
+        <!-- Vacancy Field -->
+        <div class="form-group">
+          <label for="vacancy">Vacancy Slots</label>
+          <input type="number" id="vacancy" name="vacancy" placeholder="Enter total slots" min="1" required>
+        </div>
+
+        <div class="form-group" style="grid-column: span 2;">
+          <label for="eventLocation">Location (Address)</label>
+          <input type="text" id="eventLocation" name="eventLocation" placeholder="Enter address" required>
+        </div>
+
+      </div>
+
+      <button type="submit" class="submit-btn">Add Event</button>
+    </form>
+  </div>
+</body>
+</html>
