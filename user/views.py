@@ -343,20 +343,19 @@ def employee_events(request):
     if not login_id:
         return redirect("login_page")
 
-    # get employee profile
     employee = get_object_or_404(Register, login_id=login_id)
 
-    # fetch applied & confirmed events
-    applied_events = Appointment.objects.filter(employee=employee, status="Applied")
-    confirmed_events = Appointment.objects.filter(employee=employee, status="Confirmed")
+    # 🔹 All applied events (regardless of confirmation)
+    applied_events = Appointment.objects.filter(employee=employee).order_by('event__event_date')
+
+    # 🔹 Only confirmed events
+    confirmed_events = Appointment.objects.filter(employee=employee, status="Confirmed").order_by('event__event_date')
 
     context = {
         "applied_events": applied_events,
         "confirmed_events": confirmed_events,
     }
     return render(request, "employee/appliedstatus.html", context)
-
-
 
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404, redirect
