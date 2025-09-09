@@ -89,7 +89,7 @@ def reset_password(request, uid):
 
         if password != confirm_password:
             messages.error(request, "Passwords do not match.")
-            return render(request, "employee/reset_pass.html")
+            return render(request, "reset_pass.html")
 
         emp_id = reset_links[uid]
         emp = Register.objects.get(id=emp_id)
@@ -102,7 +102,7 @@ def reset_password(request, uid):
         messages.success(request, "Password reset successful. Please login.")
         return redirect("login_page")
 
-    return render(request, "employee/reset_pass.html")
+    return render(request, "reset_pass.html")
 
 
 def employeehome_page(request):
@@ -212,74 +212,80 @@ def employee_event_details(request):
     return render(request, "employee/eventview.html", {"events": events})
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Event, Appointment, Register
+
 def apply_event(request, event_id):
-    event = get_object_or_404(Event, id=event_id)
+    # 🔹 Check if user is logged in
     login_id = request.session.get("user_id")
     if not login_id:
+        messages.error(request, "Please login first!")
         return redirect("login_page")
 
-    employee = get_object_or_404(Register, login_id=login_id)
+    # 🔹 Get employee and event objects
+    employee = get_object_or_404(Register, login__id=login_id)
+    event = get_object_or_404(Event, id=event_id)
 
-    # 🔹 Check if already applied for an event on same date
-    conflict = Appointment.objects.filter(
-        employee=employee,
-        event__event_date=event.event_date
-    ).exists()
-
-    if conflict:
-        messages.error(request, "⚠️ You have already applied for another event on this date.")
+    # 🔹 Check if employee has already applied for this event
+    if Appointment.objects.filter(employee=employee, event=event).exists():
+        messages.warning(request, "You have already applied for this event.")
         return redirect("employee_event_details")
 
-    # 🔹 Otherwise allow application
-    if not Appointment.objects.filter(employee=employee, event=event).exists():
-        Appointment.objects.create(employee=employee, event=event, status="Applied")
-        messages.success(request, "✅ Application submitted successfully!")
+    # 🔹 Check if employee has an event on the same date
+    if Appointment.objects.filter(employee=employee, event__event_date=event.event_date).exists():
+        messages.error(request, "You already have another event on this date.")
+        return redirect("employee_event_details")
+
+    # 🔹 Apply for the event
+    Appointment.objects.create(employee=employee, event=event, status="Applied")
+    messages.success(request, "Application submitted successfully!")
 
     return redirect("employee_event_details")
 
 
-
-
-
 def respond_appointment(request, appointment_id, action):
-    # Get the appointment object
     appointment = get_object_or_404(Appointment, id=appointment_id)
+    event = appointment.event
 
-    # Ensure the action is valid
     if action not in ["Confirmed", "Declined"]:
         messages.error(request, "Invalid action.")
         return redirect("applied_persons")
 
-    # Update status
-    appointment.status = action
-    appointment.save()
-
-    # Send email if confirmed
+    # if confirmed -> reduce vacancy
     if action == "Confirmed":
-        subject = "Event Confirmation"
-        message = f"""
-        Hello {appointment.employee.full_name},
+        if event.vacancy > 0:
+            event.vacancy -= 1
+            event.save()
 
-        You have been confirmed for the event:
-        {appointment.event.event_name} 
-        Location: {appointment.event.location}
-        Date: {appointment.event.event_date}
+            appointment.status = "Confirmed"
+            appointment.save()
 
-        Thank you!
-        """
-        recipient_list = [appointment.employee.email]
+            # send confirmation mail
+            subject = "Event Confirmation"
+            message = f"""
+            Hello {appointment.employee.full_name},
 
-        try:
-            send_mail(subject, message, None, recipient_list, fail_silently=False)
-            messages.success(request, f"{appointment.employee.full_name} confirmed and email sent!")
-        except Exception as e:
-            messages.warning(request, f"Confirmed, but email failed: {e}")
-    else:
+            You have been confirmed for the event:
+            {event.event_name}
+            Location: {event.location}
+            Date: {event.event_date}
+
+            Thank you!
+            """
+            recipient_list = [appointment.employee.email]
+
+            try:
+                send_mail(subject, message, None, recipient_list, fail_silently=False)
+                messages.success(request, f"{appointment.employee.full_name} confirmed, vacancy updated, email sent!")
+            except Exception as e:
+                messages.warning(request, f"Confirmed & vacancy updated, but email failed: {e}")
+        else:
+            messages.error(request, "⚠️ No more vacancies available for this event.")
+
+    elif action == "Declined":
+        appointment.status = "Declined"
+        appointment.save()
         messages.success(request, f"{appointment.employee.full_name} has been declined.")
 
     return redirect("applied_persons")
-
-
 def applied_persons(request):
     applied_list = Appointment.objects.select_related("employee", "event").all()
     return render(request, "admin/applied_persons.html", {"applied_list": applied_list})
