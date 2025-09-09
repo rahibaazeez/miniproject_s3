@@ -57,7 +57,7 @@ class Event(models.Model):
     event_date = models.DateField()
     event_time = models.TimeField()
     salary = models.DecimalField(max_digits=10, decimal_places=2)
-    vacancy = models.CharField(max_length=100)
+    vacancy = models.IntegerField(default=0)
     location = models.CharField(max_length=255)
 
     def __str__(self):

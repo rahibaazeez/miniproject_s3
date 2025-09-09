@@ -5,6 +5,8 @@ from .models import *
 from django.http import HttpResponse
 from datetime import date
 from django.core.mail import send_mail
+import uuid
+reset_links = {}
 
 
 def create_admin(request):
@@ -76,8 +78,31 @@ def registration_page(request):
     return render(request, 'employee/registration.html')
 
 
-def resetpassword_page(request):
-    return render(request, 'reset_pass.html')
+def reset_password(request, uid):
+    if uid not in reset_links:
+        messages.error(request, "Invalid or expired reset link.")
+        return redirect("forgot_password")
+
+    if request.method == "POST":
+        password = request.POST.get("password")
+        confirm_password = request.POST.get("confirm_password")
+
+        if password != confirm_password:
+            messages.error(request, "Passwords do not match.")
+            return render(request, "employee/reset_pass.html")
+
+        emp_id = reset_links[uid]
+        emp = Register.objects.get(id=emp_id)
+        login = emp.login  
+        login.password = make_password(password)
+        login.save()
+
+        del reset_links[uid]
+
+        messages.success(request, "Password reset successful. Please login.")
+        return redirect("login_page")
+
+    return render(request, "employee/reset_pass.html")
 
 
 def employeehome_page(request):
@@ -402,3 +427,49 @@ def send_reminder(request, employee_id):
     )
 
     return redirect('not_attended_persons')
+def edit_event(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    today = date.today()
+
+    # ❌ block editing past events
+    if event.event_date < today:
+        messages.error(request, "⚠️ Past events cannot be edited.")
+        return redirect("exm")
+
+    if request.method == "POST":
+        event.event_name = request.POST.get("event_name")
+        event.category = request.POST.get("eventCategory")
+        event.place_type = request.POST.get("eventPlace")
+        event.event_date = request.POST.get("eventDate")
+        event.event_time = request.POST.get("eventTime")
+        event.salary = request.POST.get("salary")
+        event.vacancy = request.POST.get("vacancy")
+        event.location = request.POST.get("eventLocation")
+        event.save()
+
+        messages.success(request, "✅ Event updated successfully!")
+        return redirect("exm")
+
+    return render(request, "admin/edit_event.html", {"event": event})
+def forgot_password(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+        try:
+            emp = Register.objects.get(email=email)   # ✅ use Register model
+            uid = str(uuid.uuid4())  # generate unique id
+            reset_links[uid] = emp.id
+
+            reset_url = request.build_absolute_uri(f"/reset_password/{uid}/")
+
+            # send reset link to email
+            send_mail(
+                "Password Reset - Serve Smart",
+                f"Click here to reset your password: {reset_url}",
+                "admin@servesmart.com",  # change to your sender email
+                [email],
+                fail_silently=False,
+            )
+            messages.success(request, "Password reset link sent to your email.")
+        except Register.DoesNotExist:
+            messages.error(request, "This email is not registered.")
+    return render(request, "employee/forgot_pass.html")

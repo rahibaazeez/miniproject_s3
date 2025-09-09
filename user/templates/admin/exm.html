@@ -84,6 +84,7 @@
                 <th>Time</th>
                 <th>Salary</th>
                 <th>Location</th>
+                <th>Action</th>  
                 
             </tr>
             {% for i in events %}
@@ -95,6 +96,16 @@
                 <td>{{ i.event_time }}</td>
                 <td>₹ {{ i.salary }}</td>
                 <td>{{ i.location }}</td>
+                 <td>
+        {% if i.event_date >= today %}
+            <a href="{% url 'edit_event' i.id %}" 
+               style="color: white; background: #8e44ad; padding: 6px 12px; border-radius: 6px; text-decoration: none;">
+               Edit
+            </a>
+        {% else %}
+            <span style="color: gray; font-style: italic;">Not Editable</span>
+        {% endif %}
+    </td>
                 
             </tr>
             {% empty %}

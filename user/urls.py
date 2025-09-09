@@ -14,7 +14,7 @@ urlpatterns = [
     path('event_add/', views.event_add, name='event_add'),
     path('add_event/', views.add_event, name='add_event'),
     path('registration_page/', views.registration_page, name='registration_page'),
-    path('resetpassword_page/', views.resetpassword_page, name='resetpassword_page'),
+    path('reset_password/<str:uid>/', views.reset_password, name='reset_password'),
     path('employeehome_page/', views.employeehome_page, name='employeehome_page'),
     path('register_employee/', views. register_employee, name='register_employee'),
     path('exm/', views. exm, name='exm'),
@@ -34,6 +34,8 @@ urlpatterns = [
     path('not_attended/', views.not_attended_persons, name='not_attended_persons'),
     path("mark_attended/<int:appointment_id>/", views.mark_attended, name="mark_attended"),
     path("send_reminder/<int:employee_id>/", views.send_reminder, name="send_reminder"),
+    path("edit_event/<int:event_id>/", views.edit_event, name="edit_event"),
+    path('forgot_password/', views.forgot_password, name='forgot_password'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
