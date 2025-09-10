@@ -162,6 +162,33 @@
         </tbody>
       </table>
     </div>
+      <h2>Declined Events</h2>
+    <div class="table-card">
+      <table class="table table-bordered table-hover">
+        <thead>
+          <tr>
+            <th>Event Name</th>
+            <th>Date</th>
+            <th>Location</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for dec in declined_events %}
+          <tr>
+            <td>{{ dec.event.event_name }}</td>
+            <td>{{ dec.event.event_date }}</td>
+            <td>{{ dec.event.location }}</td>
+            <td class="text-danger fw-bold">Declined</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="4" class="text-center text-muted">No declined events.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
 
     <!-- Back Button -->
     <a href="{% url 'employeehome_page' %}" class="btn-back">Back</a>

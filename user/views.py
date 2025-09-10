@@ -283,9 +283,32 @@ def respond_appointment(request, appointment_id, action):
     elif action == "Declined":
         appointment.status = "Declined"
         appointment.save()
-        messages.success(request, f"{appointment.employee.full_name} has been declined.")
+
+    # Send decline mail to employee
+    subject = "Application Declined - Serve Smart"
+    message = f"""
+    Hello {appointment.employee.full_name},
+
+    We regret to inform you that your application for the event has been declined.
+
+    ❌ Event: {event.event_name}
+    📅 Date: {event.event_date}
+    📍 Location: {event.location}
+
+    Please check other upcoming events and apply again.
+    Thank you for your interest.
+    """
+
+    recipient_list = [appointment.employee.email]
+
+    try:
+        send_mail(subject, message, None, recipient_list, fail_silently=False)
+        messages.success(request, f"{appointment.employee.full_name} has been declined and notified by email.")
+    except Exception as e:
+        messages.warning(request, f"{appointment.employee.full_name} declined, but email failed: {e}")
 
     return redirect("applied_persons")
+
 def applied_persons(request):
     applied_list = Appointment.objects.select_related("employee", "event").all()
     return render(request, "admin/applied_persons.html", {"applied_list": applied_list})
@@ -350,10 +373,15 @@ def employee_events(request):
 
     # 🔹 Only confirmed events
     confirmed_events = Appointment.objects.filter(employee=employee, status="Confirmed").order_by('event__event_date')
+    declined_events = Appointment.objects.filter(
+        employee=employee, status="Declined"
+    ).order_by('event__event_date')
+
 
     context = {
         "applied_events": applied_events,
         "confirmed_events": confirmed_events,
+        "declined_events": declined_events,
     }
     return render(request, "employee/appliedstatus.html", context)
 
