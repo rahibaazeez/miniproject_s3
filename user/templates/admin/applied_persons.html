@@ -210,51 +210,50 @@
                     <th>Employee Name</th>
                     <th>Email</th>
                     <th>Event</th>
-                    <th>Date</th>
                     <th>Status</th>
                     <th>Action</th>
                 </tr>
             </thead>
-            {% regroup applied_list by event.date as grouped_list %}
+             <tbody>
+   {% regroup applied_list by event.event_date as grouped_list %}
 
-    {% for group in grouped_list %}
-        <!-- Date Header Row -->
-        <tr style="background-color:#f0f0f0; font-weight:bold;">
-            <td colspan="5">{{ group.grouper|date:"F j, Y" }}</td>
-        </tr>
+{% for group in grouped_list %}
+    <!-- Date Header Row -->
+    <tr style="background-color:#f0f0f0; font-weight:bold;">
+        <td colspan="5">{{ group.grouper|date:"F j, Y" }}</td>
+    </tr>
 
-        <!-- Loop through applications for this date -->
-        {% for item in group.list %}
-        <tr>
-            <td>{{ item.employee.full_name }}</td>
-            <td>{{ item.employee.email }}</td>
-            <td>{{ item.event.event_name }}</td>
-            <td>{{ item.event.event_date}}</td>
-            <td>
-                <span class="{% if item.status == 'Applied' %}badge-applied
-                              {% elif item.status == 'Confirmed' %}badge-confirmed
-                              {% elif item.status == 'Declined' %}badge-declined{% endif %}">
-                    {{ item.status }}
-                </span>
-            </td>
-            <td>
-                <form action="{% url 'respond_appointment' item.id 'Confirmed' %}" method="post" style="display:inline;">
-                    {% csrf_token %}
-                    <button class="btn-action btn-confirm">Confirm</button>
-                </form>
-                <form action="{% url 'respond_appointment' item.id 'Declined' %}" method="post" style="display:inline;">
-                    {% csrf_token %}
-                    <button class="btn-action btn-decline">Decline</button>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
+    <!-- Loop through applications for this date -->
+    {% for item in group.list %}
+    <tr>
+        <td>{{ item.employee.full_name }}</td>
+        <td>{{ item.employee.email }}</td>
+        <td>{{ item.event.event_name }}</td>
+        <td>
+            <span class="{% if item.status == 'Applied' %}badge-applied
+                          {% elif item.status == 'Confirmed' %}badge-confirmed
+                          {% elif item.status == 'Declined' %}badge-declined{% endif %}">
+                {{ item.status }}
+            </span>
+        </td>
+        <td>
+            <form action="{% url 'respond_appointment' item.id 'Confirmed' %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button class="btn-action btn-confirm">Confirm</button>
+            </form>
+            <form action="{% url 'respond_appointment' item.id 'Declined' %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button class="btn-action btn-decline">Decline</button>
+            </form>
+        </td>
+    </tr>
     {% endfor %}
+{% endfor %}
 
-    {% if not applied_list %}
-    <tr><td colspan="5" class="text-muted">No applications yet.</td></tr>
-    {% endif %}
-            </tbody>
+{% if not applied_list %}
+<tr><td colspan="5" class="text-muted">No applications yet.</td></tr>
+{% endif %}
+    </tbody>
         </table>
     </main>
 

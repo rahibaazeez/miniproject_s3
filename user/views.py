@@ -310,8 +310,8 @@ def respond_appointment(request, appointment_id, action):
     return redirect("applied_persons")
 
 def applied_persons(request):
-    applied_list = Appointment.objects.select_related("employee", "event").all()
-    return render(request, "admin/applied_persons.html", {"applied_list": applied_list } )
+   applied_list = Appointment.objects.select_related("employee", "event").order_by("event__event_date")
+   return render(request, "admin/applied_persons.html", {"applied_list": applied_list } )
 
 
 def update_status(request, appointment_id, new_status):
