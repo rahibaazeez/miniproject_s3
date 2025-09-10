@@ -111,6 +111,7 @@
 </head>
 <body>
   <div class="container">
+     <button onclick="history.back()" class="back-btn">← Back</button>
     <h1 class="form-title">Add New Event</h1>
 
     <form id="eventForm" action="{% url 'add_event' %}" method="post">

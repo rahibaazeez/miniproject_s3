@@ -101,7 +101,9 @@
   </style>
 </head>
 <body>
+   
   <div class="container mt-4">
+     <a href="{% url 'employeehome_page' %}" class="btn btn-back mt-3">Back</a>
     <h3>Event Details</h3>
 
     {% if messages %}
@@ -129,55 +131,61 @@
           </tr>
         </thead>
         <tbody>
-          {% for event in events %}
-          <tr>
-            <td>{{ event.event_name }}</td>
-            <td>{{ event.category }}</td>
-            <td>{{ event.location }}</td>
-            <td>{{ event.event_date }}</td>
-            <td>{{ event.event_time }}</td>
-            <td>₹{{ event.salary }}</td>
-            <td>
-  {% if event.vacancy|add:0 > 0 %}
-    <span class="badge bg-success">{{ event.vacancy }}</span>
-  {% else %}
-    <span class="badge bg-danger">Full</span>
-  {% endif %}
-</td>
-            <td>
-              {% if event.status == "Upcoming" %}
-                <span class="status-badge badge-upcoming">Upcoming</span>
-              {% else %}
-                <span class="status-badge badge-completed">Completed</span>
-              {% endif %}
-            </td>
-            <td>
-              {% if event.status == "Upcoming" and event.vacancy|add:0 > 0 %}
-  <form method="post" action="{% url 'apply_event' event.id %}">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-apply btn-sm">Apply</button>
-  </form>
-{% else %}
-  <button class="btn btn-closed btn-sm" disabled>
-    {% if event.vacancy|add:0 <= 0 %}
-      Full
-    {% else %}
-      Closed
-    {% endif %}
-  </button>
-{% endif %}
-            </td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="9" class="text-center text-muted">No events available.</td>
-          </tr>
-          {% endfor %}
-        </tbody>
+         {% regroup events by event_date as grouped_events %}
+
+  {% for group in grouped_events %}
+    <!-- Date Header -->
+    <tr class="table-primary">
+      <td colspan="9" class="fw-bold text-center">
+        Events on {{ group.grouper }}
+      </td>
+    </tr>
+
+    {% for event in group.list %}
+    <tr>
+      <td>{{ event.event_name }}</td>
+      <td>{{ event.category }}</td>
+      <td>{{ event.location }}</td>
+      <td>{{ event.event_date }}</td>
+      <td>{{ event.event_time }}</td>
+      <td>₹{{ event.salary }}</td>
+      <td>
+        {% if event.vacancy|add:0 > 0 %}
+          <span class="badge bg-success">{{ event.vacancy }}</span>
+        {% else %}
+          <span class="badge bg-danger">Full</span>
+        {% endif %}
+      </td>
+      <td>
+        {% if event.status == "Upcoming" %}
+          <span class="status-badge badge-upcoming">Upcoming</span>
+        {% else %}
+          <span class="status-badge badge-completed">Completed</span>
+        {% endif %}
+      </td>
+      <td>
+        {% if event.status == "Upcoming" and event.vacancy|add:0 > 0 %}
+          <form method="post" action="{% url 'apply_event' event.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-apply btn-sm">Apply</button>
+          </form>
+        {% else %}
+          <button class="btn btn-closed btn-sm" disabled>
+            {% if event.vacancy|add:0 <= 0 %} Full {% else %} Closed {% endif %}
+          </button>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  {% empty %}
+    <tr>
+      <td colspan="9" class="text-center text-muted">No events available.</td>
+    </tr>
+  {% endfor %}
       </table>
     </div>
 
-    <a href="{% url 'employeehome_page' %}" class="btn btn-back mt-3">Back</a>
+  
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

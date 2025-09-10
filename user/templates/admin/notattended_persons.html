@@ -180,8 +180,11 @@
     </style>
 </head>
 <body>
+    
     <header>
+        <button onclick="history.back()" class="back-btn">← Back</button>
         <div class="logo">Servesmart</div>
+        
         <nav>
             <ul>
                 <li><a href="#">Settings</a></li>
@@ -200,8 +203,8 @@
                         <th>Employee Name</th>
                         <th>Email</th>
                         <th>Event</th>
+                        <th>Date</th>
                         <th>Status</th>
-                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -210,23 +213,11 @@
                         <td>{{ item.employee.full_name }}</td>
                         <td>{{ item.employee.email }}</td>
                         <td>{{ item.event.event_name }}</td>
+                        <td>{{ item.event.event_date }}</td>
                         <td>
                             <span class="badge-status badge-danger">{{ item.status }}</span>
                         </td>
-                        <td>
-                            <form action="{% url 'mark_attended' item.id %}" method="post" style="display:inline;">
-                                {% csrf_token %}
-                                <button class="btn-action btn-success" onclick="return confirm('Mark this person as attended?');">
-                                    Mark Attended
-                                </button>
-                            </form>
-                            <form action="{% url 'send_reminder' item.id %}" method="post" style="display:inline;">
-                                {% csrf_token %}
-                                <button class="btn-action btn-warning" onclick="return confirm('Send reminder to this person?');">
-                                    Send Reminder
-                                </button>
-                            </form>
-                        </td>
+                       
                     </tr>
                     {% empty %}
                     <tr>
