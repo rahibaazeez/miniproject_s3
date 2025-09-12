@@ -186,9 +186,26 @@ def add_event(request):
     return render(request, "admin/add_event.html")
 
 
+from datetime import date
+from itertools import groupby
+from operator import attrgetter
+
+
 def exm(request):
-    events = Event.objects.all() 
-    return render(request, "admin/exm.html", {"events": events})
+    events = Event.objects.all().order_by("category", "event_date")
+    today = date.today()
+
+    # group events by category
+    grouped_events = {}
+    for category, items in groupby(events, key=attrgetter("category")):
+        grouped_events[category] = list(items)
+
+    return render(
+        request,
+        "admin/exm.html",
+        {"grouped_events": grouped_events, "today": today},
+    )
+
 
 def person_names(request):
     people = Register.objects.all()

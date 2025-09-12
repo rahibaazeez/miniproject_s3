@@ -73,47 +73,44 @@
     </style>
 </head>
 <body>
-    <h2>All Events</h2>
-    <div class="table-container">
+   <h2>All Events</h2>
+<div class="table-container">
+    {% for category, events in grouped_events.items %}
+        <h3 style="margin:20px 0; color:#8e44ad;">{{ category }}</h3>
         <table>
             <tr>
                 <th>Name</th>
-                <th>Category</th>
                 <th>Place Type</th>
                 <th>Date</th>
                 <th>Time</th>
                 <th>Salary</th>
                 <th>Location</th>
-                <th>Action</th>  
-                
+                <th>Action</th>
             </tr>
             {% for i in events %}
             <tr>
                 <td>{{ i.event_name }}</td>
-                <td>{{ i.category }}</td>
                 <td>{{ i.place_type }}</td>
                 <td>{{ i.event_date }}</td>
                 <td>{{ i.event_time }}</td>
                 <td>₹ {{ i.salary }}</td>
                 <td>{{ i.location }}</td>
-                 <td>
-        {% if i.event_date >= today %}
-            <a href="{% url 'edit_event' i.id %}" 
-               style="color: white; background: #8e44ad; padding: 6px 12px; border-radius: 6px; text-decoration: none;">
-               Edit
-            </a>
-        {% else %}
-            <span style="color: gray; font-style: italic;">Not Editable</span>
-        {% endif %}
-    </td>
-                
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="9" class="no-data">No events found.</td>
+                <td>
+                    {% if i.event_date >= today %}
+                        <a href="{% url 'edit_event' i.id %}" 
+                           style="color: white; background: #8e44ad; padding: 6px 12px; border-radius: 6px; text-decoration: none;">
+                           Edit
+                        </a>
+                    {% else %}
+                        <span style="color: gray; font-style: italic;">Not Editable</span>
+                    {% endif %}
+                </td>
             </tr>
             {% endfor %}
         </table>
-    </div>
+    {% empty %}
+        <p class="no-data">No events found.</p>
+    {% endfor %}
+</div>
 </body>
 </html>
