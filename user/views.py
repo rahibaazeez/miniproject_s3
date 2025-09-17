@@ -574,3 +574,21 @@ Serve Smart Admin
 
     messages.success(request, "Urgent email sent to all registered employees!")
     return redirect("exm")  # redirect to admin event list
+
+
+
+def urgent_events(request):
+    today = date.today()
+    urgent_events = Event.objects.filter(urgent=True).order_by("event_date")
+
+    grouped_events = {}
+    for event in urgent_events:
+        category = event.category if event.category else "Other"
+        if category not in grouped_events:
+            grouped_events[category] = []
+        grouped_events[category].append(event)
+
+    return render(request, "admin/urgent_event.html", {
+        "grouped_events": grouped_events,
+        "today": today
+    })

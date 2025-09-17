@@ -38,6 +38,7 @@ urlpatterns = [
     path('forgot_password/', views.forgot_password, name='forgot_password'),
     path('send_urgent_email/<int:event_id>/', views.send_urgent_email, name='send_urgent_email'),
     path('mark_event_urgent/<int:event_id>/', views.mark_event_urgent, name='mark_event_urgent'),
+    path("urgent-events/", views.urgent_events, name="urgent_events"),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
