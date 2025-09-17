@@ -59,6 +59,7 @@ class Event(models.Model):
     salary = models.DecimalField(max_digits=10, decimal_places=2)
     vacancy = models.IntegerField(default=0)
     location = models.CharField(max_length=255)
+    urgent = models.BooleanField(default=False) 
 
     def __str__(self):
         return f"{self.event_name} - {self.event_date}"
@@ -74,6 +75,7 @@ class Appointment(models.Model):
     employee = models.ForeignKey(Register, on_delete=models.CASCADE)
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="Applied")
+    applied_date = models.DateTimeField(default=timezone.now)
 
     class Meta:
         unique_together = ('employee', 'event')

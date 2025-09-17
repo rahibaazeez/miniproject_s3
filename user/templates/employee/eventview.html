@@ -142,40 +142,42 @@
     </tr>
 
     {% for event in group.list %}
-    <tr>
-      <td>{{ event.event_name }}</td>
-      <td>{{ event.category }}</td>
-      <td>{{ event.location }}</td>
-      <td>{{ event.event_date }}</td>
-      <td>{{ event.event_time }}</td>
-      <td>₹{{ event.salary }}</td>
-      <td>
-        {% if event.vacancy|add:0 > 0 %}
-          <span class="badge bg-success">{{ event.vacancy }}</span>
-        {% else %}
-          <span class="badge bg-danger">Full</span>
-        {% endif %}
-      </td>
-      <td>
-        {% if event.status == "Upcoming" %}
-          <span class="status-badge badge-upcoming">Upcoming</span>
-        {% else %}
-          <span class="status-badge badge-completed">Completed</span>
-        {% endif %}
-      </td>
-      <td>
-        {% if event.status == "Upcoming" and event.vacancy|add:0 > 0 %}
-          <form method="post" action="{% url 'apply_event' event.id %}">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-apply btn-sm">Apply</button>
-          </form>
-        {% else %}
-          <button class="btn btn-closed btn-sm" disabled>
-            {% if event.vacancy|add:0 <= 0 %} Full {% else %} Closed {% endif %}
-          </button>
-        {% endif %}
-      </td>
-    </tr>
+   <tr {% if event.urgent %} style="background-color:#ffcccc; font-weight:bold;" {% endif %}>
+  <td>{{ event.event_name }}</td>
+  <td>{{ event.category }}</td>
+  <td>{{ event.location }}</td>
+  <td>{{ event.event_date }}</td>
+  <td>{{ event.event_time }}</td>
+  <td>₹{{ event.salary }}</td>
+  <td>
+    {% if event.vacancy|add:0 > 0 %}
+      <span class="badge bg-success">{{ event.vacancy }}</span>
+    {% else %}
+      <span class="badge bg-danger">Full</span>
+    {% endif %}
+  </td>
+  <td>
+    {% if event.status == "Upcoming" %}
+      <span class="status-badge badge-upcoming">Upcoming</span>
+    {% else %}
+      <span class="status-badge badge-completed">Completed</span>
+    {% endif %}
+  </td>
+  <td>
+    {% if event.status == "Upcoming" and event.vacancy|add:0 > 0 %}
+      <form method="post" action="{% url 'apply_event' event.id %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-apply btn-sm">
+          {% if event.urgent %} Apply (URGENT) {% else %} Apply {% endif %}
+        </button>
+      </form>
+    {% else %}
+      <button class="btn btn-closed btn-sm" disabled>
+        {% if event.vacancy|add:0 <= 0 %} Full {% else %} Closed {% endif %}
+      </button>
+    {% endif %}
+  </td>
+</tr>
     {% endfor %}
   {% empty %}
     <tr>

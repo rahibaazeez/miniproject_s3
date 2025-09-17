@@ -523,3 +523,54 @@ def forgot_password(request):
         except Register.DoesNotExist:
             messages.error(request, "This email is not registered.")
     return render(request, "employee/forgot_pass.html")
+
+
+def mark_event_urgent(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    
+    # Only mark urgent if vacancies not filled
+    confirmed_count = Appointment.objects.filter(event=event, status="Confirmed").count()
+    if confirmed_count < event.vacancy:
+        event.urgent = True
+        event.save()
+        messages.success(request, f"The event '{event.event_name}' is now marked as URGENT.")
+    else:
+        messages.info(request, f"No need to mark '{event.event_name}' as urgent. Enough employees are confirmed.")
+    
+    return redirect("exm")  # 
+
+
+def send_urgent_email(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    
+    # Ensure the event is marked as urgent
+    event.urgent = True
+    event.save()
+
+    # Get all registered employees
+    employees = Register.objects.all()
+
+    # Send email to each employee
+    for emp in employees:
+        try:
+            send_mail(
+                subject=f"URGENT: Event '{event.event_name}' needs employees!",
+                message=f"""
+Hello {emp.full_name},
+
+The event '{event.event_name}' scheduled on {event.event_date} at {event.location} still has vacancies. 
+
+Please apply immediately if you are available.
+
+Thank you,
+Serve Smart Admin
+""",
+                from_email="admin@servesmart.com",  # your admin email
+                recipient_list=[emp.email],
+                fail_silently=False,
+            )
+        except Exception as e:
+            print(f"Failed to send email to {emp.email}: {e}")
+
+    messages.success(request, "Urgent email sent to all registered employees!")
+    return redirect("exm")  # redirect to admin event list
