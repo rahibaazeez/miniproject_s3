@@ -165,13 +165,17 @@
         <h2>Login</h2>
 
         <!-- Message Display Section -->
-        <div class="messages">
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="{{ message.tags }}">{{ message }}</div>
-                {% endfor %}
+        <!-- Message Display Section -->
+<div class="messages">
+    {% if messages %}
+        {% for message in messages %}
+            {% if "error" in message.tags or "info" in message.tags %}
+                <div class="{{ message.tags }}">{{ message }}</div>
             {% endif %}
-        </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
 
         <form action="{% url 'login_page' %}" method="post">
             {% csrf_token %}

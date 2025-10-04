@@ -39,6 +39,9 @@ urlpatterns = [
     path('send_urgent_email/<int:event_id>/', views.send_urgent_email, name='send_urgent_email'),
     path('mark_event_urgent/<int:event_id>/', views.mark_event_urgent, name='mark_event_urgent'),
     path("urgent-events/", views.urgent_events, name="urgent_events"),
+    path('employee/urgent_events/', views.employee_urgent_events, name='employee_urgent_events'),
+    path('admin/urgent-applied-persons/', views.urgent_applied_persons, name='urgent_applied_persons'),
+    path('admin/urgent-applied-persons/', views.urgent_applied_persons, name='urgent_applied_persons'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

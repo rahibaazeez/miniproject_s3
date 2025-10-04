@@ -106,7 +106,15 @@ def reset_password(request, uid):
 
 
 def employeehome_page(request):
-    return render(request, 'employee/employee_home.html')
+    login_id = request.session.get("user_id")
+    employee = None
+    if login_id:
+        try:
+            employee = get_object_or_404(Register, login__id=login_id)
+        except Register.DoesNotExist:
+            employee = None
+
+    return render(request, 'employee/employee_home.html', {'employee': employee})
 
 def event_add(request):
     return render(request, 'admin/add_event.html')
@@ -217,7 +225,8 @@ def person_details(request, pk):
     return render(request, "admin/persondetails_list.html", {"person": person})
 
 def employee_event_details(request):
-    events = Event.objects.all()
+    # Order by date descending, latest events first
+    events = Event.objects.all().order_by('-event_date', '-event_time')
     today = date.today()
 
     for event in events:
@@ -227,8 +236,6 @@ def employee_event_details(request):
             event.status = "Completed"
 
     return render(request, "employee/eventview.html", {"events": events})
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import Event, Appointment, Register
 
 def apply_event(request, event_id):
     # 🔹 Check if user is logged in
@@ -592,3 +599,42 @@ def urgent_events(request):
         "grouped_events": grouped_events,
         "today": today
     })
+
+
+
+def employee_urgent_events(request):
+    # Get logged-in employee
+    login_id = request.session.get("user_id")
+    if not login_id:
+        return redirect("login_page")
+    
+    employee = get_object_or_404(Register, login__id=login_id)
+    
+    # Fetch urgent events that still have vacancies
+    urgent_events = Event.objects.filter(urgent=True).order_by('event_date')
+    
+    # Mark status as Upcoming/Completed for display
+    today = date.today()
+    for event in urgent_events:
+        event.status = "Upcoming" if event.event_date >= today else "Completed"
+    
+    return render(request, "employee/urgent_eventview.html", {"urgent_events": urgent_events})
+
+
+def urgent_applied_persons(request):
+    # Get appointments for events marked as urgent
+    urgent_appointments = Appointment.objects.filter(event__urgent=True).select_related('employee', 'event').order_by('event__event_date')
+
+    context = {
+        'urgent_appointments': urgent_appointments
+    }
+    return render(request, 'admin/urgent_applied_persons.html', context)
+
+def urgent_applied_persons(request):
+    # Get appointments for events marked as urgent
+    urgent_appointments = Appointment.objects.filter(event__urgent=True).select_related('employee', 'event').order_by('event__event_date')
+
+    context = {
+        'urgent_appointments': urgent_appointments
+    }
+    return render(request, 'admin/urgent_applied_persons.html', context)
